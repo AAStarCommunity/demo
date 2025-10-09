@@ -2,6 +2,7 @@ import { useState } from "react";
 import "./App.css";
 import { EndUserDemo } from "./components/EndUserDemo";
 import { OperatorDemo } from "./pages/OperatorDemo";
+import { DeveloperDemo } from "./pages/DeveloperDemo";
 
 function App() {
   const [activeRole, setActiveRole] = useState<
@@ -51,9 +52,7 @@ function App() {
 
         {activeRole === "developer" && (
           <div className="demo-panel">
-            <h2>Developer Demo</h2>
-            <p>Integrate SuperPaymaster into your DApp</p>
-            {/* TODO: Implement developer demo */}
+            <DeveloperDemo />
           </div>
         )}
       </main>
