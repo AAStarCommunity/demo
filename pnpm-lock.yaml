@@ -8,9 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@aastar/shared-config':
-        specifier: file:../aastar-shared-config
-        version: file:../aastar-shared-config
       ethers:
         specifier: ^6.13.0
         version: 6.15.0
@@ -65,9 +62,6 @@ importers:
         version: 7.1.9(@types/node@24.7.0)
 
 packages:
-
-  '@aastar/shared-config@file:../aastar-shared-config':
-    resolution: {directory: ../aastar-shared-config, type: directory}
 
   '@adraffy/ens-normalize@1.10.1':
     resolution: {integrity: sha512-96Z2IP3mYmF1Xg2cDm8f1gWGf/HUVedQ3FMifV4kG/PQ4yEP51xDtRAEfhVNt5f/uzpNkZHwWQuUcu6D6K+Ekw==}
@@ -1198,8 +1192,6 @@ packages:
     engines: {node: '>=10'}
 
 snapshots:
-
-  '@aastar/shared-config@file:../aastar-shared-config': {}
 
   '@adraffy/ens-normalize@1.10.1': {}
 
