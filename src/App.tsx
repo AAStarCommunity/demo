@@ -14,8 +14,8 @@ function App() {
     <div className="demo-container">
       <ThemeToggle />
       <header>
-        <h1>SuperPaymaster Demo Playground</h1>
-        <p>Interactive showcase for ERC-4337 Account Abstraction</p>
+        <h1>AAStar Demo Playground</h1>
+        <p>Interactive demos for blockchain applications and protocols</p>
       </header>
 
       <nav className="role-selector">

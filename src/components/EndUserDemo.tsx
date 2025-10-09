@@ -267,7 +267,7 @@ export function EndUserDemo() {
 
       setBalances({
         pnt: ethers.formatEther(pntBal),
-        sbt: ethers.formatEther(sbtBal),
+        sbt: sbtBal.toString(), // SBT is ERC-721, no decimals
         usdt: ethers.formatUnits(usdtBal, 6), // USDT has 6 decimals
       });
     } catch (error) {
