@@ -1,8 +1,11 @@
-import { useState } from 'react'
-import './App.css'
+import { useState } from "react";
+import "./App.css";
+import { EndUserDemo } from "./components/EndUserDemo";
 
 function App() {
-  const [activeRole, setActiveRole] = useState<'user' | 'operator' | 'developer'>('user')
+  const [activeRole, setActiveRole] = useState<
+    "user" | "operator" | "developer"
+  >("user");
 
   return (
     <div className="demo-container">
@@ -12,36 +15,34 @@ function App() {
       </header>
 
       <nav className="role-selector">
-        <button 
-          className={activeRole === 'user' ? 'active' : ''}
-          onClick={() => setActiveRole('user')}
+        <button
+          className={activeRole === "user" ? "active" : ""}
+          onClick={() => setActiveRole("user")}
         >
           End User
         </button>
-        <button 
-          className={activeRole === 'operator' ? 'active' : ''}
-          onClick={() => setActiveRole('operator')}
+        <button
+          className={activeRole === "operator" ? "active" : ""}
+          onClick={() => setActiveRole("operator")}
         >
           Operator
         </button>
-        <button 
-          className={activeRole === 'developer' ? 'active' : ''}
-          onClick={() => setActiveRole('developer')}
+        <button
+          className={activeRole === "developer" ? "active" : ""}
+          onClick={() => setActiveRole("developer")}
         >
           Developer
         </button>
       </nav>
 
       <main>
-        {activeRole === 'user' && (
+        {activeRole === "user" && (
           <div className="demo-panel">
-            <h2>End User Demo</h2>
-            <p>Experience gasless transactions and account abstraction</p>
-            {/* TODO: Implement user demo */}
+            <EndUserDemo />
           </div>
         )}
 
-        {activeRole === 'operator' && (
+        {activeRole === "operator" && (
           <div className="demo-panel">
             <h2>Operator Demo</h2>
             <p>Manage your Paymaster and earn fees</p>
@@ -49,7 +50,7 @@ function App() {
           </div>
         )}
 
-        {activeRole === 'developer' && (
+        {activeRole === "developer" && (
           <div className="demo-panel">
             <h2>Developer Demo</h2>
             <p>Integrate SuperPaymaster into your DApp</p>
@@ -58,7 +59,7 @@ function App() {
         )}
       </main>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;
