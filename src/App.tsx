@@ -3,6 +3,7 @@ import "./App.css";
 import { EndUserDemo } from "./components/EndUserDemo";
 import { OperatorDemo } from "./pages/OperatorDemo";
 import { DeveloperDemo } from "./pages/DeveloperDemo";
+import { ThemeToggle } from "./components/ThemeToggle";
 
 function App() {
   const [activeRole, setActiveRole] = useState<
@@ -11,6 +12,7 @@ function App() {
 
   return (
     <div className="demo-container">
+      <ThemeToggle />
       <header>
         <h1>SuperPaymaster Demo Playground</h1>
         <p>Interactive showcase for ERC-4337 Account Abstraction</p>
