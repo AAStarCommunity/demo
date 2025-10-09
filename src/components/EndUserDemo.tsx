@@ -4,6 +4,13 @@ import "./EndUserDemo.css";
 import "./gasless-styles.css";
 import { sendGaslessTransaction } from "../utils/userOp";
 
+// Extend Window interface for MetaMask
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+}
+
 const FAUCET_API = "https://faucet-app-ashy.vercel.app/api";
 const SEPOLIA_CHAIN_ID = "0xaa36a7";
 
@@ -22,7 +29,11 @@ export function EndUserDemo() {
     signer: null,
   });
 
-  const [aaAccount, setAaAccount] = useState<string>("");
+  const [aaAccount, setAaAccount] = useState<string>(() => {
+    // 从 localStorage 恢复 AA 账户
+    return localStorage.getItem("demo_aa_account") || "";
+  });
+
   const [loading, setLoading] = useState<string>("");
   const [message, setMessage] = useState<{
     type: "success" | "error" | "info";
@@ -95,6 +106,9 @@ export function EndUserDemo() {
         signer,
       });
 
+      // 保存钱包地址到 localStorage
+      localStorage.setItem("demo_wallet_address", address);
+
       setMessage({
         type: "success",
         text: `Connected: ${address.slice(0, 6)}...${address.slice(-4)}`,
@@ -118,6 +132,11 @@ export function EndUserDemo() {
       signer: null,
     });
     setAaAccount("");
+
+    // 清除 localStorage
+    localStorage.removeItem("demo_wallet_address");
+    localStorage.removeItem("demo_aa_account");
+
     setMessage({ type: "info", text: "Wallet disconnected" });
   };
 
@@ -148,6 +167,10 @@ export function EndUserDemo() {
       }
 
       setAaAccount(data.accountAddress);
+
+      // 保存 AA 账户到 localStorage
+      localStorage.setItem("demo_aa_account", data.accountAddress);
+
       setMessage({
         type: "success",
         text: `AA Account created: ${data.accountAddress.slice(0, 6)}...${data.accountAddress.slice(-4)}`,
@@ -303,6 +326,18 @@ export function EndUserDemo() {
       setLoading("");
     }
   };
+
+  // Auto-reconnect wallet on page load
+  useEffect(() => {
+    const savedAddress = localStorage.getItem("demo_wallet_address");
+    if (savedAddress && !wallet.connected && isMetaMaskInstalled()) {
+      // 尝试自动重连
+      connectWallet().catch(() => {
+        // 静默失败，用户可以手动重连
+        localStorage.removeItem("demo_wallet_address");
+      });
+    }
+  }, []);
 
   // Load balances when wallet connects
   useEffect(() => {
