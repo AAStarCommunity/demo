@@ -11,7 +11,7 @@ declare global {
   }
 }
 
-const FAUCET_API = "https://faucet-app-ashy.vercel.app/api";
+const FAUCET_API = "https://faucet.aastar.io/api";
 const SEPOLIA_CHAIN_ID = "0xaa36a7";
 
 interface WalletState {
