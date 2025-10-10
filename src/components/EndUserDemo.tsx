@@ -190,11 +190,19 @@ export function EndUserDemo() {
       return;
     }
 
+    if (!aaAccount) {
+      setMessage({
+        type: "error",
+        text: "Please create AA account first. Tokens will be minted to your AA account.",
+      });
+      return;
+    }
+
     const endpoint = tokenType === "usdt" ? "/mint-usdt" : "/mint";
     const body =
       tokenType === "usdt"
-        ? { address: wallet.address }
-        : { address: wallet.address, type: tokenType };
+        ? { address: aaAccount }
+        : { address: aaAccount, type: tokenType };
 
     try {
       setLoading(`Claiming ${tokenType.toUpperCase()}...`);
@@ -217,8 +225,11 @@ export function EndUserDemo() {
         txHash: data.txHash,
       });
 
-      // Refresh balances
+      // Refresh balances immediately
       await loadBalances();
+
+      // Retry after delay for blockchain indexing
+      setTimeout(() => loadBalances(), 3000);
     } catch (error: any) {
       if (error.message.includes("429")) {
         setMessage({
@@ -236,6 +247,16 @@ export function EndUserDemo() {
   // Load token balances
   const loadBalances = async () => {
     if (!wallet.connected || !wallet.provider) return;
+
+    // If no AA account yet, show zero balances
+    if (!aaAccount) {
+      setBalances({
+        pnt: "0",
+        sbt: "0",
+        usdt: "0",
+      });
+      return;
+    }
 
     try {
       // Contract addresses from shared-config
@@ -261,10 +282,11 @@ export function EndUserDemo() {
         wallet.provider,
       );
 
+      // Query AA account balances, not EOA
       const [pntBal, sbtBal, usdtBal] = await Promise.all([
-        pntContract.balanceOf(wallet.address),
-        sbtContract.balanceOf(wallet.address),
-        usdtContract.balanceOf(wallet.address),
+        pntContract.balanceOf(aaAccount),
+        sbtContract.balanceOf(aaAccount),
+        usdtContract.balanceOf(aaAccount),
       ]);
 
       setBalances({
@@ -317,8 +339,11 @@ export function EndUserDemo() {
         txHash: result.txHash,
       });
 
-      // Refresh balances
+      // Refresh balances immediately
       await loadBalances();
+
+      // Retry after delay for blockchain indexing
+      setTimeout(() => loadBalances(), 3000);
     } catch (error: any) {
       console.error("Gasless transaction error:", error);
       setMessage({
@@ -342,14 +367,14 @@ export function EndUserDemo() {
     }
   }, []);
 
-  // Load balances when wallet connects
+  // Load balances when wallet connects or AA account changes
   useEffect(() => {
     if (wallet.connected) {
       loadBalances();
       const interval = setInterval(loadBalances, 10000); // Refresh every 10s
       return () => clearInterval(interval);
     }
-  }, [wallet.connected, wallet.address]);
+  }, [wallet.connected, wallet.address, aaAccount]);
 
   return (
     <div className="end-user-demo">
@@ -418,7 +443,13 @@ export function EndUserDemo() {
       {/* Claim Tokens */}
       {wallet.connected && (
         <div className="card">
-          <h3>3. Claim Test Tokens</h3>
+          <h3>3. Claim Test Tokens {aaAccount && "(to AA Account)"}</h3>
+          {!aaAccount && (
+            <p className="warning-text" style={{ marginBottom: "16px" }}>
+              ⚠️ Please create an AA account first. Tokens will be minted to
+              your AA account.
+            </p>
+          )}
           <div className="balances">
             <div className="balance-item">
               <span>PNT:</span>
@@ -437,21 +468,24 @@ export function EndUserDemo() {
             <button
               className="btn-token btn-pnt"
               onClick={() => claimTokens("pnt")}
-              disabled={!!loading}
+              disabled={!!loading || !aaAccount}
+              title={!aaAccount ? "Create AA account first" : ""}
             >
               Claim 100 PNT
             </button>
             <button
               className="btn-token btn-sbt"
               onClick={() => claimTokens("sbt")}
-              disabled={!!loading}
+              disabled={!!loading || !aaAccount}
+              title={!aaAccount ? "Create AA account first" : ""}
             >
               Claim 1 SBT
             </button>
             <button
               className="btn-token btn-usdt"
               onClick={() => claimTokens("usdt")}
-              disabled={!!loading}
+              disabled={!!loading || !aaAccount}
+              title={!aaAccount ? "Create AA account first" : ""}
             >
               Claim 10 USDT
             </button>
