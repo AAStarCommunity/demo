@@ -211,6 +211,9 @@ export async function sendGaslessTransaction(
 ): Promise<{ txHash: string; blockNumber: number }> {
   const rpcUrl =
     import.meta.env.VITE_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+
+  // Beneficiary is the address that receives gas refund from EntryPoint
+  // Should be the AA owner address (user's MetaMask address)
   const beneficiary = await signer.getAddress();
 
   // Step 1: Build UserOp
