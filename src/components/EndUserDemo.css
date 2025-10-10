@@ -196,8 +196,8 @@
     border-radius: 8px;
     font-size: 14px;
     display: flex;
-    align-items: center;
-    gap: 12px;
+    flex-direction: column;
+    gap: 8px;
 }
 
 .status-message.success {
@@ -242,6 +242,27 @@
     100% {
         transform: rotate(360deg);
     }
+}
+
+/* Etherscan Link */
+.etherscan-link {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 13px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: rgba(102, 126, 234, 0.1);
+    transition: all 0.2s;
+    align-self: flex-start;
+}
+
+.etherscan-link:hover {
+    background: rgba(102, 126, 234, 0.2);
+    transform: translateX(2px);
 }
 
 /* Responsive */

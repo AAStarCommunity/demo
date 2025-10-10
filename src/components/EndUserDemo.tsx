@@ -38,6 +38,7 @@ export function EndUserDemo() {
   const [message, setMessage] = useState<{
     type: "success" | "error" | "info";
     text: string;
+    txHash?: string;
   } | null>(null);
   const [balances, setBalances] = useState<{
     pnt: string;
@@ -212,7 +213,8 @@ export function EndUserDemo() {
 
       setMessage({
         type: "success",
-        text: `Successfully claimed ${tokenType.toUpperCase()}! TX: ${data.txHash.slice(0, 10)}...`,
+        text: `Successfully claimed ${tokenType.toUpperCase()}!`,
+        txHash: data.txHash,
       });
 
       // Refresh balances
@@ -311,7 +313,8 @@ export function EndUserDemo() {
 
       setMessage({
         type: "success",
-        text: `🎉 Gasless transaction sent! TX: ${result.txHash.slice(0, 10)}... Block: ${result.blockNumber}`,
+        text: `🎉 Gasless transaction sent! Block: ${result.blockNumber}`,
+        txHash: result.txHash,
       });
 
       // Refresh balances
@@ -534,7 +537,19 @@ export function EndUserDemo() {
       )}
 
       {message && !loading && (
-        <div className={`status-message ${message.type}`}>{message.text}</div>
+        <div className={`status-message ${message.type}`}>
+          <div>{message.text}</div>
+          {message.txHash && (
+            <a
+              href={`https://sepolia.etherscan.io/tx/${message.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="etherscan-link"
+            >
+              View on Etherscan →
+            </a>
+          )}
+        </div>
       )}
     </div>
   );

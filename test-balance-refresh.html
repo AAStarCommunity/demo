@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test Balance Refresh</title>
+  <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+</head>
+<body>
+  <h2>Balance Test</h2>
+  <div>
+    <p>Address: <span id="address">0x3d5eD655f7d112e6420467504CcaaB397922c035</span></p>
+    <p>PNT Balance: <span id="pnt-balance">Loading...</span></p>
+    <p>SBT Balance: <span id="sbt-balance">Loading...</span></p>
+    <p>USDT Balance: <span id="usdt-balance">Loading...</span></p>
+  </div>
+  <button onclick="loadBalances()">Refresh Balances</button>
+
+  <script>
+    const address = '0x3d5eD655f7d112e6420467504CcaaB397922c035';
+    const RPC_URL = 'https://eth-sepolia.g.alchemy.com/v2/Bx4QRW1-vnwJUePSAAD7N';
+    
+    const PNT_TOKEN = '0xD14E87d8D8B69016Fcc08728c33799bD3F66F180';
+    const SBT_TOKEN = '0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f';
+    const USDT_TOKEN = '0x14EaC6C3D49AEDff3D59773A7d7bfb50182bCfDc';
+
+    async function loadBalances() {
+      const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+      
+      const erc20Abi = ['function balanceOf(address) view returns (uint256)'];
+      
+      const pntContract = new ethers.Contract(PNT_TOKEN, erc20Abi, provider);
+      const sbtContract = new ethers.Contract(SBT_TOKEN, erc20Abi, provider);
+      const usdtContract = new ethers.Contract(USDT_TOKEN, erc20Abi, provider);
+      
+      const [pntBal, sbtBal, usdtBal] = await Promise.all([
+        pntContract.balanceOf(address),
+        sbtContract.balanceOf(address),
+        usdtContract.balanceOf(address),
+      ]);
+      
+      document.getElementById('pnt-balance').textContent = ethers.utils.formatEther(pntBal);
+      document.getElementById('sbt-balance').textContent = sbtBal.toString();
+      document.getElementById('usdt-balance').textContent = ethers.utils.formatUnits(usdtBal, 6);
+    }
+    
+    loadBalances();
+  </script>
+</body>
+</html>

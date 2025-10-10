@@ -4,6 +4,7 @@ import { EndUserDemo } from "./components/EndUserDemo";
 import { OperatorDemo } from "./pages/OperatorDemo";
 import { DeveloperDemo } from "./pages/DeveloperDemo";
 import { ThemeToggle } from "./components/ThemeToggle";
+import { ContractInfo } from "./components/ContractInfo";
 
 function App() {
   const [activeRole, setActiveRole] = useState<
@@ -43,18 +44,21 @@ function App() {
         {activeRole === "user" && (
           <div className="demo-panel">
             <EndUserDemo />
+            <ContractInfo />
           </div>
         )}
 
         {activeRole === "operator" && (
           <div className="demo-panel">
             <OperatorDemo />
+            <ContractInfo />
           </div>
         )}
 
         {activeRole === "developer" && (
           <div className="demo-panel">
             <DeveloperDemo />
+            <ContractInfo />
           </div>
         )}
       </main>
