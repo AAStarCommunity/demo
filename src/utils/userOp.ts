@@ -118,48 +118,72 @@ export async function buildUserOp(
 }
 
 /**
- * Sign UserOperation with AA account owner's private key
+ * Sign UserOperation hash directly with AA account owner's private key
+ * Uses direct hash signing (not message signing like signMessage)
  */
 export async function signUserOp(
   userOp: PackedUserOperation,
-  provider: ethers.BrowserProvider,
+  rpcUrl: string,
   signer: ethers.Signer,
 ): Promise<string> {
+  // Use independent RPC provider to get userOpHash
+  const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
   const entryPoint = new ethers.Contract(
     CONTRACTS.entryPoint,
     EntryPointABI,
-    provider,
+    rpcProvider,
   );
 
   // Get userOpHash from EntryPoint
   const userOpHash = await entryPoint.getUserOpHash(userOp);
   console.log("UserOpHash:", userOpHash);
 
-  // Sign with EOA (MetaMask)
-  const signature = await signer.signMessage(ethers.getBytes(userOpHash));
+  // Request MetaMask to sign the hash directly using eth_sign
+  // This signs the raw hash, not prefixed message
+  const provider = signer.provider as ethers.BrowserProvider;
+  if (!provider) {
+    throw new Error("Signer has no provider");
+  }
+
+  const signerAddress = await signer.getAddress();
+  const signature = await provider.send("eth_sign", [
+    signerAddress,
+    userOpHash,
+  ]);
   console.log("Signature:", signature);
 
   return signature;
 }
 
 /**
- * Submit UserOperation via EntryPoint.handleOps
+ * Submit UserOperation via EntryPoint.handleOps using independent RPC
  */
 export async function submitUserOp(
   userOp: PackedUserOperation,
-  _provider: ethers.BrowserProvider,
-  signer: ethers.Signer,
+  rpcUrl: string,
+  beneficiary: string,
 ): Promise<ethers.TransactionReceipt> {
+  // Use independent RPC provider to submit transaction
+  const rpcProvider = new ethers.JsonRpcProvider(rpcUrl);
+
+  // Get private key from environment (server-side execution would be better)
+  // For now, we need to use a funded wallet to submit the transaction
+  // This is a simplified approach - in production, use a relayer service
+  const submitterPrivateKey = import.meta.env.VITE_SUBMITTER_PRIVATE_KEY;
+  if (!submitterPrivateKey) {
+    throw new Error("VITE_SUBMITTER_PRIVATE_KEY not configured");
+  }
+
+  const submitterWallet = new ethers.Wallet(submitterPrivateKey, rpcProvider);
+
   const entryPoint = new ethers.Contract(
     CONTRACTS.entryPoint,
     EntryPointABI,
-    signer,
+    submitterWallet,
   );
 
-  const signerAddress = await signer.getAddress();
-
   console.log("Submitting UserOp via EntryPoint.handleOps...");
-  const tx = await entryPoint.handleOps([userOp], signerAddress, {
+  const tx = await entryPoint.handleOps([userOp], beneficiary, {
     gasLimit: 1000000n, // High gas limit for safety
   });
 
@@ -185,6 +209,10 @@ export async function sendGaslessTransaction(
   provider: ethers.BrowserProvider,
   signer: ethers.Signer,
 ): Promise<{ txHash: string; blockNumber: number }> {
+  const rpcUrl =
+    import.meta.env.VITE_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+  const beneficiary = await signer.getAddress();
+
   // Step 1: Build UserOp
   const userOp = await buildUserOp(
     aaAccount,
@@ -194,12 +222,12 @@ export async function sendGaslessTransaction(
     signer,
   );
 
-  // Step 2: Sign UserOp
-  const signature = await signUserOp(userOp, provider, signer);
+  // Step 2: Sign UserOp hash with MetaMask (only signing, not submitting)
+  const signature = await signUserOp(userOp, rpcUrl, signer);
   userOp.signature = signature;
 
-  // Step 3: Submit UserOp
-  const receipt = await submitUserOp(userOp, provider, signer);
+  // Step 3: Submit UserOp using independent RPC provider (not MetaMask)
+  const receipt = await submitUserOp(userOp, rpcUrl, beneficiary);
 
   return {
     txHash: receipt.hash,
