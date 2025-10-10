@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Balance Display</title>
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+    <h1>Debug Balance Display</h1>
+    <div id="results"></div>
+
+    <script>
+        const AA_ACCOUNT = "0x3d5eD655f7d112e6420467504CcaaB397922c035";
+        const SBT_TOKEN = "0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f";
+        const PNT_TOKEN = "0xD14E87d8D8B69016Fcc08728c33799bD3F66F180";
+        const USDT_TOKEN = "0x14EaC6C3D49AEDff3D59773A7d7bfb50182bCfDc";
+        const RPC_URL = "https://eth-sepolia.g.alchemy.com/v2/Bx4QRW1-vnwJUePSAAD7N";
+
+        async function checkBalances() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Checking balances...</p>';
+
+            try {
+                const provider = new ethers.JsonRpcProvider(RPC_URL);
+                const erc20Abi = ["function balanceOf(address) view returns (uint256)"];
+
+                const sbtContract = new ethers.Contract(SBT_TOKEN, erc20Abi, provider);
+                const pntContract = new ethers.Contract(PNT_TOKEN, erc20Abi, provider);
+                const usdtContract = new ethers.Contract(USDT_TOKEN, erc20Abi, provider);
+
+                console.log("Querying balances for:", AA_ACCOUNT);
+
+                const [sbtBal, pntBal, usdtBal] = await Promise.all([
+                    sbtContract.balanceOf(AA_ACCOUNT),
+                    pntContract.balanceOf(AA_ACCOUNT),
+                    usdtContract.balanceOf(AA_ACCOUNT),
+                ]);
+
+                console.log("Raw SBT balance:", sbtBal.toString());
+                console.log("Raw PNT balance:", pntBal.toString());
+                console.log("Raw USDT balance:", usdtBal.toString());
+
+                const sbtFormatted = sbtBal.toString();
+                const pntFormatted = ethers.formatEther(pntBal);
+                const usdtFormatted = ethers.formatUnits(usdtBal, 6);
+
+                console.log("Formatted SBT:", sbtFormatted);
+                console.log("Formatted PNT:", pntFormatted);
+                console.log("Formatted USDT:", usdtFormatted);
+
+                results.innerHTML = `
+                    <h2>Balance Results:</h2>
+                    <p><strong>AA Account:</strong> ${AA_ACCOUNT}</p>
+                    <hr>
+                    <h3>SBT (ERC-721):</h3>
+                    <p>Raw: ${sbtBal.toString()}</p>
+                    <p>Formatted: ${sbtFormatted}</p>
+                    <p>parseFloat().toFixed(2): ${parseFloat(sbtFormatted).toFixed(2)}</p>
+                    <hr>
+                    <h3>PNT (ERC-20):</h3>
+                    <p>Raw: ${pntBal.toString()}</p>
+                    <p>Formatted: ${pntFormatted}</p>
+                    <p>parseFloat().toFixed(2): ${parseFloat(pntFormatted).toFixed(2)}</p>
+                    <hr>
+                    <h3>USDT (ERC-20):</h3>
+                    <p>Raw: ${usdtBal.toString()}</p>
+                    <p>Formatted: ${usdtFormatted}</p>
+                    <p>parseFloat().toFixed(2): ${parseFloat(usdtFormatted).toFixed(2)}</p>
+                `;
+            } catch (error) {
+                console.error("Error:", error);
+                results.innerHTML = `<p style="color: red;">Error: ${error.message}</p>`;
+            }
+        }
+
+        checkBalances();
+    </script>
+</body>
+</html>

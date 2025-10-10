@@ -13,6 +13,8 @@ declare global {
 
 const FAUCET_API = "https://faucet.aastar.io/api";
 const SEPOLIA_CHAIN_ID = "0xaa36a7";
+const SEPOLIA_RPC_URL =
+  import.meta.env.VITE_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
 
 interface WalletState {
   connected: boolean;
@@ -246,7 +248,7 @@ export function EndUserDemo() {
 
   // Load token balances
   const loadBalances = async () => {
-    if (!wallet.connected || !wallet.provider) return;
+    if (!wallet.connected) return;
 
     // If no AA account yet, show zero balances
     if (!aaAccount) {
@@ -259,6 +261,9 @@ export function EndUserDemo() {
     }
 
     try {
+      // Use dedicated RPC provider for balance queries (independent of MetaMask)
+      const rpcProvider = new ethers.JsonRpcProvider(SEPOLIA_RPC_URL);
+
       // Contract addresses from shared-config
       const PNT_TOKEN = "0xD14E87d8D8B69016Fcc08728c33799bD3F66F180";
       const SBT_TOKEN = "0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f";
@@ -266,20 +271,12 @@ export function EndUserDemo() {
 
       const erc20Abi = ["function balanceOf(address) view returns (uint256)"];
 
-      const pntContract = new ethers.Contract(
-        PNT_TOKEN,
-        erc20Abi,
-        wallet.provider,
-      );
-      const sbtContract = new ethers.Contract(
-        SBT_TOKEN,
-        erc20Abi,
-        wallet.provider,
-      );
+      const pntContract = new ethers.Contract(PNT_TOKEN, erc20Abi, rpcProvider);
+      const sbtContract = new ethers.Contract(SBT_TOKEN, erc20Abi, rpcProvider);
       const usdtContract = new ethers.Contract(
         USDT_TOKEN,
         erc20Abi,
-        wallet.provider,
+        rpcProvider,
       );
 
       // Query AA account balances, not EOA
@@ -458,6 +455,17 @@ export function EndUserDemo() {
             <div className="balance-item">
               <span>SBT:</span>
               <strong>{parseFloat(balances.sbt).toFixed(2)}</strong>
+              {aaAccount && parseFloat(balances.sbt) > 0 && (
+                <a
+                  href={`https://sepolia.etherscan.io/token/0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f?a=${aaAccount}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="balance-link"
+                  title="View SBT on Etherscan"
+                >
+                  🔗
+                </a>
+              )}
             </div>
             <div className="balance-item">
               <span>USDT:</span>
