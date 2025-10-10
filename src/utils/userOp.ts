@@ -138,18 +138,10 @@ export async function signUserOp(
   const userOpHash = await entryPoint.getUserOpHash(userOp);
   console.log("UserOpHash:", userOpHash);
 
-  // Request MetaMask to sign the hash directly using eth_sign
-  // This signs the raw hash, not prefixed message
-  const provider = signer.provider as ethers.BrowserProvider;
-  if (!provider) {
-    throw new Error("Signer has no provider");
-  }
-
-  const signerAddress = await signer.getAddress();
-  const signature = await provider.send("eth_sign", [
-    signerAddress,
-    userOpHash,
-  ]);
+  // Use MetaMask's personal_sign (signMessage)
+  // This adds the "\x19Ethereum Signed Message:\n32" prefix
+  // SimpleAccountV2 supports this format natively
+  const signature = await signer.signMessage(ethers.getBytes(userOpHash));
   console.log("Signature:", signature);
 
   return signature;
