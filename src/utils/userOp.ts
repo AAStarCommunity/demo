@@ -138,20 +138,11 @@ export async function signUserOp(
   const userOpHash = await entryPoint.getUserOpHash(userOp);
   console.log("UserOpHash:", userOpHash);
 
-  // MetaMask has disabled eth_sign, so we use signMessage (personal_sign)
-  // This adds "\x19Ethereum Signed Message:\n32" prefix
-  // SimpleAccount's ECDSA.recover expects raw signature, so this will NOT work
-  // We need to either:
-  // 1. Modify SimpleAccount contract to use MessageHashUtils.toEthSignedMessageHash()
-  // 2. Ask user to enable eth_sign in MetaMask settings
-  // 3. Use a backend service to sign with raw private key
-
-  // For now, try personal_sign and see if it fails as expected
+  // Use signMessage (personal_sign) which adds Ethereum Signed Message prefix
+  // This works with SimpleAccountV2 which supports MessageHashUtils.toEthSignedMessageHash()
+  // If the AA account is still V1, it needs to be upgraded first
   const signature = await signer.signMessage(ethers.getBytes(userOpHash));
-  console.log("Signature (with prefix):", signature);
-  console.warn(
-    "⚠️ This signature has Ethereum Signed Message prefix and will likely fail validation in SimpleAccount",
-  );
+  console.log("Signature:", signature);
 
   return signature;
 }

@@ -3,6 +3,10 @@ import { ethers } from "ethers";
 import "./EndUserDemo.css";
 import "./gasless-styles.css";
 import { sendGaslessTransaction } from "../utils/userOp";
+import {
+  checkAccountVersion,
+  upgradeAccountToV2,
+} from "../utils/accountUpgrade";
 
 // Extend Window interface for MetaMask
 declare global {
@@ -320,6 +324,28 @@ export function EndUserDemo() {
     }
 
     try {
+      // Check if account needs upgrade to V2
+      setLoading("Checking account version...");
+      const { version, needsUpgrade } = await checkAccountVersion(
+        aaAccount,
+        wallet.provider,
+      );
+
+      if (needsUpgrade) {
+        setMessage({
+          type: "info",
+          text: `Your AA account is V${version}. Upgrading to V2 to support MetaMask signing...`,
+        });
+
+        setLoading("Upgrading account to V2...");
+        await upgradeAccountToV2(aaAccount, wallet.signer);
+
+        setMessage({
+          type: "success",
+          text: "Account upgraded to V2! Now sending transaction...",
+        });
+      }
+
       setLoading("Building and signing UserOperation...");
 
       const result = await sendGaslessTransaction(
