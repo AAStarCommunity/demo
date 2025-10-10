@@ -161,7 +161,8 @@ export async function submitUserOp(
   // Get private key from environment (server-side execution would be better)
   // For now, we need to use a funded wallet to submit the transaction
   // This is a simplified approach - in production, use a relayer service
-  const submitterPrivateKey = import.meta.env.VITE_SUBMITTER_PRIVATE_KEY;
+  const submitterPrivateKey =
+    import.meta.env.VITE_SUBMITTER_PRIVATE_KEY?.trim();
   if (!submitterPrivateKey) {
     throw new Error("VITE_SUBMITTER_PRIVATE_KEY not configured");
   }
@@ -202,7 +203,7 @@ export async function sendGaslessTransaction(
   signer: ethers.Signer,
 ): Promise<{ txHash: string; blockNumber: number }> {
   const rpcUrl =
-    import.meta.env.VITE_SEPOLIA_RPC_URL || "https://rpc.sepolia.org";
+    import.meta.env.VITE_SEPOLIA_RPC_URL?.trim() || "https://rpc.sepolia.org";
 
   // Beneficiary is the address that receives gas refund from EntryPoint
   // Should be the AA owner address (user's MetaMask address)
