@@ -72,7 +72,7 @@ Click "Connect MetaMask" and:
 
 Click "Create Account" to deploy a SimpleAccount:
 - A random salt is generated
-- Account is created via SimpleAccountFactory
+- Account is created via SimpleAccountFactoryV2 (supports both personal_sign and raw signatures)
 - View your account on Etherscan
 
 ### 3. Claim Test Tokens
@@ -126,7 +126,7 @@ demo/
 | PNT Token | `0xD14E87d8D8B69016Fcc08728c33799bD3F66F180` |
 | SBT Token | `0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f` |
 | USDT Token | `0x14EaC6C3D49AEDff3D59773A7d7bfb50182bCfDc` |
-| SimpleAccountFactory | `0x9bD66892144FCf0BAF5B6946AEAFf38B0d967881` |
+| SimpleAccountFactoryV2 | `0x8B516A71c134a4b5196775e63b944f88Cc637F2b` |
 | SuperPaymasterRegistry | `0x838da93c815a6E45Aa50429529da9106C0621eF0` |
 
 ## 🧪 Testing

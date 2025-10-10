@@ -54,9 +54,9 @@ const CONTRACTS: Contract[] = [
     hasOwner: true,
   },
   {
-    name: "SimpleAccountFactory",
-    address: "0x9bD66892144FCf0BAF5B6946AEAFf38B0d967881",
-    description: "Smart account factory",
+    name: "SimpleAccountFactoryV2",
+    address: "0x8B516A71c134a4b5196775e63b944f88Cc637F2b",
+    description: "Smart account factory (supports personal_sign)",
     type: "Factory",
     hasOwner: false,
   },
@@ -69,7 +69,8 @@ const CONTRACTS: Contract[] = [
   },
 ];
 
-const SEPOLIA_RPC_URL = "https://eth-sepolia.g.alchemy.com/v2/Bx4QRW1-vnwJUePSAAD7N";
+const SEPOLIA_RPC_URL =
+  "https://eth-sepolia.g.alchemy.com/v2/Bx4QRW1-vnwJUePSAAD7N";
 
 export function ContractInfo() {
   const [owners, setOwners] = useState<Record<string, string>>({});
@@ -93,7 +94,7 @@ export function ContractInfo() {
             const contractInstance = new ethers.Contract(
               contract.address,
               ownerAbi,
-              provider
+              provider,
             );
             const owner = await contractInstance.owner();
             ownerData[contract.address] = owner;

@@ -16,7 +16,7 @@
 | **GasTokenV2 (PNT)** | `0xD14E87d8D8B69016Fcc08728c33799bD3F66F180` | ERC-20 | Points token for gas payment |
 | **GasTokenFactoryV2** | `0x6720Dc8ce5021bC6F3F126054556b5d3C125101F` | Factory | Factory for creating GasTokens |
 | **SBT Token** | `0xBfde68c232F2248114429DDD9a7c3Adbff74bD7f` | ERC-721 | Soul Bound Token (non-transferable) |
-| **SimpleAccountFactory** | `0x9bD66892144FCf0BAF5B6946AEAFf38B0d967881` | Factory | Smart account factory |
+| **SimpleAccountFactoryV2** | `0x8B516A71c134a4b5196775e63b944f88Cc637F2b` | Factory | Smart account factory (supports personal_sign) |
 | **MockUSDT** | `0x14EaC6C3D49AEDff3D59773A7d7bfb50182bCfDc` | ERC-20 | Test USDT (6 decimals) |
 
 ## ✨ 功能特性
