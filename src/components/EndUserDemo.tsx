@@ -424,14 +424,36 @@ export function EndUserDemo() {
               <p>
                 <strong>AA Account:</strong> {aaAccount}
               </p>
-              <a
-                href={`https://sepolia.etherscan.io/address/${aaAccount}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="link"
-              >
-                View on Etherscan →
-              </a>
+              <div style={{ display: "flex", gap: "12px", marginTop: "12px" }}>
+                <a
+                  href={`https://sepolia.etherscan.io/address/${aaAccount}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="link"
+                >
+                  View on Etherscan →
+                </a>
+                <button
+                  className="btn-secondary"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Are you sure you want to clear this AA account? You can create a new one afterwards.",
+                      )
+                    ) {
+                      setAaAccount("");
+                      localStorage.removeItem("demo_aa_account");
+                      setMessage({
+                        type: "info",
+                        text: "AA account cleared. You can create a new one now.",
+                      });
+                    }
+                  }}
+                  disabled={!!loading}
+                >
+                  Clear Account
+                </button>
+              </div>
             </div>
           )}
         </div>
